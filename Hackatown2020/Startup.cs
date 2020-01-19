@@ -1,7 +1,10 @@
+using Hackatown2020.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +29,10 @@ namespace Hackatown2020
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            var connection = @"Server=OPOUP-MACOS;Database=Hackatown2020;Trusted_Connection=True;ConnectRetryCount=0";
+            services.AddDbContext<Hackatown2020Context>
+            (options => options.UseSqlServer(connection));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,19 +51,9 @@ namespace Hackatown2020
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            if (!env.IsDevelopment())
-            {
-                app.UseSpaStaticFiles();
-            }
+            app.UseSpaStaticFiles();
+            app.UseStaticFiles();
 
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
-            });
 
             app.UseSpa(spa =>
             {

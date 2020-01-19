@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Hackatown2020.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/data")]
     public class DataController : ControllerBase
     {
         private readonly AirPollutionCalculationLogic _airPollutionCalculationLogic;

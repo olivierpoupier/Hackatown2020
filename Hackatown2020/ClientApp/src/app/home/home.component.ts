@@ -1,32 +1,16 @@
-import { Component, AfterViewInit, ViewChild, ElementRef } from'@angular/core';
-
-const heatMapData = [
-  {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
-  new google.maps.LatLng(37.782, -122.445),
-  {location: new google.maps.LatLng(37.782, -122.443), weight: 2},
-  {location: new google.maps.LatLng(37.782, -122.441), weight: 3},
-  {location: new google.maps.LatLng(37.782, -122.439), weight: 2},
-  new google.maps.LatLng(37.782, -122.437),
-  {location: new google.maps.LatLng(37.782, -122.435), weight: 0.5},
-
-  {location: new google.maps.LatLng(37.785, -122.447), weight: 3},
-  {location: new google.maps.LatLng(37.785, -122.445), weight: 2},
-  new google.maps.LatLng(37.785, -122.443),
-  {location: new google.maps.LatLng(37.785, -122.441), weight: 0.5},
-  new google.maps.LatLng(37.785, -122.439),
-  {location: new google.maps.LatLng(37.785, -122.437), weight: 2},
-  {location: new google.maps.LatLng(37.785, -122.435), weight: 3}
-];
+import { Component, AfterViewInit, ViewChild, ElementRef, OnInit } from'@angular/core';
+import { CurrentDataService } from '../services/current-data.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
 })
 
-export class HomeComponent implements AfterViewInit {
+export class HomeComponent implements AfterViewInit, OnInit{
   @ViewChild('mapContainer', { static: false }) gmap: ElementRef;
   map: google.maps.Map;
 
+  heatMapData: any[] = [];
   heatmap : any;
 
   lat = 45.641026;
@@ -39,10 +23,20 @@ export class HomeComponent implements AfterViewInit {
     zoom: 13
   };
 
-  marker = new google.maps.Marker({
-    position: this.montreal,
-    map: this.map
-  });
+  constructor(private currentDataService: CurrentDataService) {
+
+  }
+  ngOnInit() {
+    this.currentDataService.fetchData()
+      .then(x => {
+        x.stations.forEach(station => {
+          this.heatMapData.push(
+            { location: new google.maps.LatLng(station.latitude, station.longitude), weight: station.qualite }
+          )
+        })
+      })
+      .catch(e => console.log(e));
+  }
 
   ngAfterViewInit() {
     this.mapInitializer();
@@ -52,11 +46,9 @@ export class HomeComponent implements AfterViewInit {
     this.map = new google.maps.Map(this.gmap.nativeElement, this.mapOptions);
 
     this.heatmap  = new google.maps.visualization.HeatmapLayer({
-      data: heatMapData
+      data: this.heatMapData
     });
 
     this.heatmap.setMap(this.map);
-  
-    this.marker.setMap(this.map);
   }
 }

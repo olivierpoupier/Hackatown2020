@@ -7,5 +7,6 @@ namespace Hackatown2020.Models.DTO
 {
     public class CurrentDataDTO
     {
+        public List<StationDTO> stations { get; set; }
     }
 }
